@@ -19,11 +19,14 @@ def main(filename):
     timeseries = [t[0] for t in detector_data]
     timestamps = [t[1] for t in detector_data]
 
+    orig_series = timeseries[:]
+    orig_stamps = timestamps[:]
+
     res = SpikeDetector.detect_anomalies(timeseries, timestamps)
 
-    plot_data(timeseries, timestamps, res)
+    plot_data(timeseries, timestamps, res, orig_series, orig_stamps)
 
-def plot_data(timeseries, timestamps, res):
+def plot_data(timeseries, timestamps, res, orig_series, orig_stamps):
     """Plots results for timeseries"""
     r_t = []
     r_d = []
@@ -31,7 +34,7 @@ def plot_data(timeseries, timestamps, res):
         r_t.append(r)
         r_d.append(0)
 
-    plot(timestamps, timeseries, r_t, r_d, "rs")
+    plot(timestamps, timeseries, r_t, r_d, "rs", orig_stamps, orig_series, "g")
     show()
 
 if __name__ == "__main__":
