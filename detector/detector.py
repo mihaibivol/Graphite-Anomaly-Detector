@@ -8,29 +8,27 @@ class Detector(object):
         pass
 
     @classmethod
-    def detect_anomalies(cls, timeseries_data):
+    def detect_anomalies(cls, timeseries, timestamps):
         """Detects anomalies in a timeseries"""
-        pass
+        assert len(timeseries) == len(timestamps), \
+               "Must provide equal length timeseries and timestamp lists"
 
     @classmethod
-    def smooth_data(cls, timeseries_data, level = 3):
+    def smooth_data(cls, timeseries, level = 3):
         """Smooth local maxima level times"""
         while level:
-            cls._smooth_data(timeseries_data)
+            cls._smooth_data(timeseries)
             level -= 1
 
 
     @classmethod
-    def _smooth_data(cls, timeseries_data):
+    def _smooth_data(cls, timeseries):
         """Smooth local maxima"""
-
-        #TODO change format to be independent from Graphite
-        for i in xrange(1, len(timeseries_data['datapoints']) - 1):
-            left = timeseries_data['datapoints'][i - 1][0]
-            right = timeseries_data['datapoints'][i + 1][0]
-            if left > timeseries_data['datapoints'][i][0] and \
-               right > timeseries_data['datapoints'][i][0]:
-                timeseries_data['datapoints'][i][0] = (left + right) / 2
+        for i in xrange(1, len(timeseries) - 1):
+            left = timeseries[i - 1]
+            right = timeseries[i + 1]
+            if left > timeseries[i] and right > timeseries[i]:
+                timeseries[i] = (left + right) / 2
 
 
 class TimeSeriesBitmap2D(object):
@@ -80,13 +78,11 @@ class SpikeDetector(Detector):
     SECONDS_PER_SYMBOL = 1200
 
     @classmethod
-    def detect_anomalies(cls, timeseries_data):
+    def detect_anomalies(cls, timeseries, timestamps):
         """Detects anomalies in a timeseries"""
+        super(cls, SpikeDetector).detect_anomalies(timeseries, timestamps)
 
-        cls.smooth_data(timeseries_data)
-
-        timeseries = [d[0] for d in timeseries_data['datapoints']]
-        timestamps = [d[1] for d in timeseries_data['datapoints']]
+        cls.smooth_data(timeseries)
 
         # Seconds bethween measurements
         retention = (timestamps[-1] - timestamps[0]) / len(timestamps)
@@ -105,7 +101,7 @@ class SpikeDetector(Detector):
         symbols_per_datapoint = int(round(cls.SECONDS_PER_SYMBOL / float(retention)))
 
         # Convert timeseries into SAX notation
-        words, intervals = sax_generator.sliding_window(timeseries, num_windows, .8)
+        words, intervals = sax_generator.sliding_window(timeseries, num_windows, .9)
 
         maximum_count = {i: 0 for i in xrange(len(timeseries))}
 
@@ -122,7 +118,7 @@ class SpikeDetector(Detector):
 
         for key, value in maximum_count.iteritems():
             if value == max_value:
-                yield (0, (0, timestamps[key]))
+                yield timestamps[key]
 
 class SlidingWindowDetector(Detector):
     WORD_SIZE = 4
@@ -132,11 +128,9 @@ class SlidingWindowDetector(Detector):
     WINDOW_SECONDS_COUNT = 3600
 
     @classmethod
-    def detect_anomalies(cls, timeseries_data):
+    def detect_anomalies(cls, timeseries, timestamps):
         """Detects anomalies in a timeseries"""
-
-        timeseries = [d[0] for d in timeseries_data['datapoints']]
-        timestamps = [d[1] for d in timeseries_data['datapoints']]
+        super(cls, SlidingWindowDetector).detect_anomalies(timeseries, timestamps)
 
         # Seconds bethween measurements
         retention = (timestamps[-1] - timestamps[0]) / len(timestamps)
@@ -183,4 +177,4 @@ class SlidingWindowDetector(Detector):
             distance = lag_bitmap.distance(lead_bitmap)
 
             if distance > .5:
-                yield (distance, (timestamps[lag_intervals[0][0]], timestamps[lead_intervals[-1][1]]))
+                yield timestamps[lead_intervals[-1][1]]
