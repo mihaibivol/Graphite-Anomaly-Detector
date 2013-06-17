@@ -1,5 +1,6 @@
 from saxpy import SAX
 
+import numpy
 import string
 
 class Detector(object):
@@ -80,11 +81,17 @@ class SpikeDetector(Detector):
     WINDOW_SECONDS_COUNT = 3600 * 12
     SECONDS_PER_SYMBOL = 1200
 
+    TRESHOLD_FACTOR = .4
+
     @classmethod
     def detect_anomalies(cls, timeseries, timestamps):
         """Detects anomalies in a timeseries"""
         super(cls, SpikeDetector).detect_anomalies(timeseries, timestamps)
 
+        # Get maximum before smoothing
+        max_value = max(timeseries)
+
+        # Smoooth data
         cls.smooth_data(timeseries)
 
         # Seconds bethween measurements
@@ -121,10 +128,11 @@ class SpikeDetector(Detector):
                     maximum_count[index] += 1
                 window_count[index] += 1
 
-        max_value = max(maximum_count.values())
+        treshold = cls.TRESHOLD_FACTOR * max_value
 
         for key, value in maximum_count.iteritems():
-            if value == window_count[key] and value:
+            if value == window_count[key] and value and \
+               timeseries[key] > treshold:
                 yield timestamps[key]
 
 class SlidingWindowDetector(Detector):
