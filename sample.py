@@ -19,7 +19,7 @@ def main(filename):
     timeseries = [t[0] for t in detector_data]
     timestamps = [t[1] for t in detector_data]
 
-    res = SlidingWindowDetector.detect_anomalies(timeseries, timestamps)
+    res = SpikeDetector.detect_anomalies(timeseries, timestamps)
 
     plot_data(timeseries, timestamps, res)
 
