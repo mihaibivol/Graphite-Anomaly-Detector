@@ -106,7 +106,10 @@ class SpikeDetector(Detector):
         # Convert timeseries into SAX notation
         words, intervals = sax_generator.sliding_window(timeseries, num_windows, .9)
 
+        # Times index i is a maximal value
         maximum_count = {i: 0 for i in xrange(len(timeseries))}
+        # Times index i is passed by a window
+        window_count = {i: 0 for i in xrange(len(timeseries))}
 
         for i in xrange(len(words)):
             word = words[i]
@@ -116,11 +119,12 @@ class SpikeDetector(Detector):
                 index = j * symbols_per_datapoint + interval[0]
                 if word[j] == string.ascii_lowercase[cls.ALPHABET_SIZE - 1]:
                     maximum_count[index] += 1
+                window_count[index] += 1
 
         max_value = max(maximum_count.values())
 
         for key, value in maximum_count.iteritems():
-            if value == max_value:
+            if value == window_count[key] and value:
                 yield timestamps[key]
 
 class SlidingWindowDetector(Detector):
