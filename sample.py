@@ -19,11 +19,6 @@ def main(filename):
     for r in res:
         print r[0], time.ctime(r[1][0]), time.ctime(r[1][1])
 
-    res = SlidingWindowDetector.detect_anomalies(data[0])
-    plot_data(data[0], res)
-    for r in res:
-        print r[0], time.ctime(r[1][0]), time.ctime(r[1][1])
-
 def plot_data(data, res):
     timeseries = [d[0] for d in data['datapoints']]
     timestamps = [d[1] for d in data['datapoints']]
