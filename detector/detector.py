@@ -15,7 +15,7 @@ class Detector(object):
 
     @classmethod
     def smooth_data(cls, timeseries, level = 3):
-        """Smooth local maxima level times"""
+        """Smooth local maxima and minima level times"""
         while level:
             cls._smooth_data(timeseries)
             level -= 1
@@ -23,10 +23,13 @@ class Detector(object):
 
     @classmethod
     def _smooth_data(cls, timeseries):
-        """Smooth local maxima"""
+        """Smooth local maxima and minima"""
         for i in xrange(1, len(timeseries) - 1):
             left = timeseries[i - 1]
             right = timeseries[i + 1]
+            if left < timeseries[i] and right < timeseries[i]:
+                timeseries[i] = (left + right) / 2
+
             if left > timeseries[i] and right > timeseries[i]:
                 timeseries[i] = (left + right) / 2
 
