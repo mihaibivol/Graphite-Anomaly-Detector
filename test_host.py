@@ -18,7 +18,7 @@ def main(host_string, pattern):
     targets = [t for t in targets if re.match(pattern, t) is not None]
 
     for target in targets:
-        print "testing %s" target
+        print "testing %s" % target
         os.system("./test_metric.py %s %s" % (host_string, target))
         time.sleep(SLEEP_VAL)
 
