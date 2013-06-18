@@ -16,6 +16,7 @@ def main(filename):
     detector_data = data[0]['datapoints']
 
     timeseries = [t[0] for t in detector_data]
+    SpikeDetector.convert_null_values(timeseries)
     timestamps = [t[1] for t in detector_data]
 
     orig_series = timeseries[:]

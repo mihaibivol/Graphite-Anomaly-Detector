@@ -9,6 +9,14 @@ class Detector(object):
         assert len(timeseries) == len(timestamps), \
                "Must provide equal length timeseries and timestamp lists"
 
+        # Convert null values
+        cls.convert_null_values(timeseries)
+
+    @classmethod
+    def convert_null_values(cls, timeseries):
+        for i in xrange(len(timeseries)):
+            timeseries[i] = 0 if timeseries[i] is None else timeseries[i]
+
     @classmethod
     def smooth_data(cls, timeseries, level = 3):
         """Smooth local maxima and minima level times"""
