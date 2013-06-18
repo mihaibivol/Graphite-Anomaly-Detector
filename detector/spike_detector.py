@@ -6,7 +6,7 @@ import string
 
 class SpikeDetector(Detector):
     ALPHABET_SIZE = 4
-    WINDOW_SECONDS_COUNT = 3600 * 12
+    WINDOW_SECONDS_COUNT = 3600 * 8
     SECONDS_PER_SYMBOL = 1200
 
     TRESHOLD_FACTOR = .1
@@ -50,7 +50,7 @@ class SpikeDetector(Detector):
         symbols_per_datapoint = int(round(cls.SECONDS_PER_SYMBOL / float(retention)))
 
         # Convert timeseries into SAX notation
-        words, intervals = sax_generator.sliding_window(timeseries, num_windows, .9)
+        words, intervals = sax_generator.sliding_window(timeseries, num_windows, .8)
 
         # Times index i is a maximal value
         maximum_count = {i: 0 for i in xrange(len(timeseries))}
