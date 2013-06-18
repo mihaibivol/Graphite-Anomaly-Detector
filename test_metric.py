@@ -37,7 +37,7 @@ def main(host_string, target, start = None, end = None):
 
     res = SpikeDetector.detect_anomalies(timeseries, timestamps)
 
-    create_logfile("gigi", (orig_stamps, orig_series), (timestamps, timeseries), res)
+    create_logfile("log/%s_%s.log" % (host_string, target), (orig_stamps, orig_series), (timestamps, timeseries), res)
 
 if __name__ == "__main__":
     if len(sys.argv) is not 3 and len(sys.argv) is not 5:
