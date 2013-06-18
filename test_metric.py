@@ -10,7 +10,7 @@ import requests
 USAGE = "test_metric host_string target [start end]"
 
 HOUR_COUNT = [4, 8, 12]
-SECONDS_PER_SYMBOL = [300, 600, 900, 1200]
+SECONDS_PER_SYMBOL = [600, 1200]
 
 TEST_CASES = [(h, s) for h in HOUR_COUNT for s in SECONDS_PER_SYMBOL]
 
