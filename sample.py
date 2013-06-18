@@ -6,6 +6,7 @@ from pylab import show, plot
 import sys
 import json
 import time
+import numpy
 
 def main(filename):
     fp = open(filename, 'r')
@@ -28,12 +29,15 @@ def main(filename):
 
 def plot_data(timeseries, timestamps, res, orig_series, orig_stamps):
     """Plots results for timeseries"""
+    mean = numpy.mean(SpikeDetector._get_local_maxima(timeseries))
+
     r_t, r_d = [], []
     for t, v in res:
         r_t.append(t)
         r_d.append(v)
 
-    plot(timestamps, timeseries, r_t, r_d, "rs", orig_stamps, orig_series, "g")
+    plot(timestamps, timeseries, r_t, r_d, "rs", orig_stamps, orig_series, "g",
+         [timestamps[0], timestamps[-1]], [mean, mean], "r")
     show()
 
 if __name__ == "__main__":
