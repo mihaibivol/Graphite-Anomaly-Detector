@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from detector.detector import SlidingWindowDetector, SpikeDetector
+from detector import SlidingWindowDetector, SpikeDetector
 from pylab import show, plot
 
 import sys
