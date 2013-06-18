@@ -9,6 +9,28 @@ import requests
 
 USAGE = "test_metric host_string target [start end]"
 
+HOUR_COUNT = [4, 8, 12]
+SECONDS_PER_SYMBOL = [300, 600, 900, 1200]
+
+TEST_CASES = [(h, s) for h in HOUR_COUNT for s in SECONDS_PER_SYMBOL]
+
+def test_case(window_hour_count, seconds_per_symbol,
+              timeseries, timestamps, name):
+    SpikeDetector.WINDOW_SECONDS_COUNT = window_hour_count * 3600
+    SpikeDetector.SECONDS_PER_SYMBOL = seconds_per_symbol
+
+    timeseries_c = timeseries[:]
+    timestamps_c = timestamps[:]
+
+    res = SpikeDetector.detect_anomalies(timeseries_c, timestamps_c)
+
+    create_logfile("log/%d_%d_%s.log" % (window_hour_count, seconds_per_symbol,
+                                         name),
+                   (timestamps, timeseries),
+                   (timestamps_c, timeseries_c), res)
+
+
+
 def main(host_string, target, start = None, end = None):
     payload = {
             'target': target,
@@ -32,12 +54,9 @@ def main(host_string, target, start = None, end = None):
     SpikeDetector.convert_null_values(timeseries)
     timestamps = [t[1] for t in detector_data]
 
-    orig_series = timeseries[:]
-    orig_stamps = timestamps[:]
+    for h, s in TEST_CASES:
+        test_case(h, s, timeseries, timestamps, "%s_%s" % (host_string, target))
 
-    res = SpikeDetector.detect_anomalies(timeseries, timestamps)
-
-    create_logfile("log/%s_%s.log" % (host_string, target), (orig_stamps, orig_series), (timestamps, timeseries), res)
 
 if __name__ == "__main__":
     if len(sys.argv) is not 3 and len(sys.argv) is not 5:
