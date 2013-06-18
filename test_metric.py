@@ -52,6 +52,10 @@ def main(host_string, target, start = None, end = None):
 
     timeseries = [t[0] for t in detector_data]
     SpikeDetector.convert_null_values(timeseries)
+
+    if sum(timeseries) == 0:
+        return
+
     timestamps = [t[1] for t in detector_data]
 
     for h, s in TEST_CASES:
