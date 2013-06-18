@@ -28,11 +28,10 @@ def main(filename):
 
 def plot_data(timeseries, timestamps, res, orig_series, orig_stamps):
     """Plots results for timeseries"""
-    r_t = []
-    r_d = []
-    for r in res:
-        r_t.append(r)
-        r_d.append(0)
+    r_t, r_d = [], []
+    for t, v in res:
+        r_t.append(t)
+        r_d.append(v)
 
     plot(timestamps, timeseries, r_t, r_d, "rs", orig_stamps, orig_series, "g")
     show()

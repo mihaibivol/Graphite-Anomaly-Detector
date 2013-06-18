@@ -12,12 +12,23 @@ class SpikeDetector(Detector):
     TRESHOLD_FACTOR = .1
 
     @classmethod
+    def _get_local_maxima(cls, timeseries):
+        """Return all local maxima in timeseries"""
+        ret = []
+        for i in xrange(1, len(timeseries) - 1):
+            left = timeseries[i - 1]
+            right = timeseries[i + 1]
+            if timeseries[i] > left and timeseries[i] > right:
+                ret.append(timeseries[i])
+
+        return ret
+
+    @classmethod
     def detect_anomalies(cls, timeseries, timestamps):
         """Detects anomalies in a timeseries"""
         super(cls, SpikeDetector).detect_anomalies(timeseries, timestamps)
-
-        # Get maximum before smoothing
-        max_value = max(timeseries)
+        # Get the mean of all local maxima to have a treshold for spikes
+        max_value = numpy.mean(cls._get_local_maxima(timeseries))
 
         # Smoooth data
         cls.smooth_data(timeseries)
@@ -56,11 +67,12 @@ class SpikeDetector(Detector):
                     maximum_count[index] += 1
                 window_count[index] += 1
 
-        treshold = cls.TRESHOLD_FACTOR * max_value
+        #TODO get foruma for treshold using the mean of all local maxima
+        treshold = 0
 
         for key, value in maximum_count.iteritems():
             if value == window_count[key] and value and \
                timeseries[key] > treshold:
-                yield timestamps[key]
+                yield (timestamps[key], timeseries[key])
 
 
