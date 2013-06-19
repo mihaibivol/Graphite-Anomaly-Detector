@@ -19,7 +19,13 @@ OUTPUT_FILE = 'report.csv'
 
 def get_host_targets(host_string, pattern):
     """Returns targets that match pattern from a graphite host"""
-    pass
+    response = requests.get('http://%s/metrics/index.json' % host_string)
+
+    targets = json.loads(response.text)
+
+    targets = [t for t in targets if fnmatch.fnmatch(t, pattern)]
+
+    return targets
 
 def get_timeseries(host_string, target):
     """Returns target timeseries for host"""
@@ -73,8 +79,13 @@ def get_arguments():
     return arg_parser.parse_args(sys.argv[1:])
 
 def main():
-    args = get_arguments()
-    print args
+    args = vars(get_arguments())
+
+    pattern = args['pattern'][0]
+    # Get servers targets
+    targets = { s: get_host_targets(s, pattern) for s in args['servers'] }
+
+    print targets
 
 if __name__ == "__main__":
     sys.exit(main())
