@@ -29,15 +29,29 @@ def get_host_targets(host_string, pattern):
 
 def get_timeseries(host_string, target):
     """Returns target timeseries for host"""
-    pass
+    return [], []
 
-def detect_anomalies(detector, timestamps, timeseries):
+def detect_anomalies(detector, timeseries, timestamps):
     """Returns spikes found in timeseries using detector"""
-    pass
+    return []
 
-def process_host(host_string, target):
-    """Returns spikes found target timeseries for host"""
-    pass
+def process(targets, timeout):
+    # Send requests without timeouts to all servers
+    while len(targets) != 0:
+        for host_string in targets.keys():
+            # Get target
+            target = targets[host_string].pop()
+            # Check remaining targets
+            if len(targets[host_string]) == 0:
+                del targets[host_string]
+
+            print targets
+            # Process
+            timeseries, timestamps = get_timeseries(host_string, target)
+            print detect_anomalies(None, timeseries, timestamps)
+
+        # Sleep bethween requests
+        time.sleep(timeout)
 
 def get_arguments():
     arg_parser = ArgumentParser(description = DESCRIPTION,
@@ -62,7 +76,7 @@ def get_arguments():
 
     arg_parser.add_argument('-t', '--timeout',
                             nargs = 1,
-                            default = [DEFAULT_HOST_LIMIT],
+                            default = [DEFAULT_SLEEP_VAL],
                             type = int,
                             help = 'Timeout bethween requests for host')
 
@@ -83,11 +97,12 @@ def main():
 
     pattern = args['pattern'][0]
     limit = args['limit'][0]
+    timeout = args['timeout'][0]
     # Get servers targets
     targets = { s: get_host_targets(s, pattern)[:limit] \
                 for s in args['servers'] }
 
-    print targets
+    process(targets, timeout)
 
 if __name__ == "__main__":
     sys.exit(main())
