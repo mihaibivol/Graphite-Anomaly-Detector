@@ -16,7 +16,7 @@ def create_logfile(filename, original_data, processed_data, results):
 
     fp.close()
 
-def view_logfile(filename):
+def view_logfile(filename, show = True):
     """Plots the data from a logfile"""
     fp = open(filename, 'r')
 
@@ -26,7 +26,7 @@ def view_logfile(filename):
     processed_data = data['processed_data']
     results = data['results']
 
-    plot_data(original_data, processed_data, results)
+    plot_data(filename, original_data, processed_data, results, show)
 
     fp.close()
 

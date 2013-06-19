@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 
 from util.logger import view_logfile
+from pylab import show
 
 import sys
 
-USAGE = "view_log logfile"
-
-def main(logfile):
-    view_logfile(logfile)
+def main(logfiles):
+    for logfile in logfiles:
+        view_logfile(logfile, False)
+    show()
 
 if __name__ == "__main__":
-    if len(sys.argv) is not 2:
-        print USAGE
-        sys.exit(-1)
-    sys.exit(main(sys.argv[1]))
+    sys.exit(main(sys.argv[1:]))
 
