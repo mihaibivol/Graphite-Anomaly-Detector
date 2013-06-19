@@ -24,7 +24,7 @@ def main(filename):
 
     res = SpikeDetector.detect_anomalies(timeseries, timestamps)
 
-    plot_data((orig_stamps, orig_series), (timestamps, timeseries), res)
+    plot_data(filename, (orig_stamps, orig_series), (timestamps, timeseries), res)
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1]))
