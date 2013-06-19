@@ -28,8 +28,21 @@ def get_host_targets(host_string, pattern):
     return targets
 
 def get_timeseries(host_string, target):
-    """Returns target timeseries for host"""
-    return [], []
+    """Returns tuple timeseries, timestamps for host"""
+    url = 'http://%s/render/' % host_string
+    payload = {
+            'target': target,
+            'format': 'json' }
+    response = requests.get(url, params = payload)
+
+    data = json.loads(response.text)
+
+    detector_data = data[0]['datapoints']
+
+    timeseries = [t[0] for t in detector_data]
+    timestamps = [t[1] for t in detector_data]
+
+    return timeseries, timestamps
 
 def detect_anomalies(detector, timeseries, timestamps):
     """Returns spikes found in timeseries using detector"""
@@ -45,10 +58,10 @@ def process(targets, timeout):
             if len(targets[host_string]) == 0:
                 del targets[host_string]
 
-            print targets
             # Process
             timeseries, timestamps = get_timeseries(host_string, target)
-            print detect_anomalies(None, timeseries, timestamps)
+            print timeseries, timestamps
+            anomalies = detect_anomalies(None, timeseries, timestamps)
 
         # Sleep bethween requests
         time.sleep(timeout)
