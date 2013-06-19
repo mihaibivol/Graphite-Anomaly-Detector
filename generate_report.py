@@ -82,8 +82,10 @@ def main():
     args = vars(get_arguments())
 
     pattern = args['pattern'][0]
+    limit = args['limit'][0]
     # Get servers targets
-    targets = { s: get_host_targets(s, pattern) for s in args['servers'] }
+    targets = { s: get_host_targets(s, pattern)[:limit] \
+                for s in args['servers'] }
 
     print targets
 
