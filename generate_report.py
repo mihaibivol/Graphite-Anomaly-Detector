@@ -11,11 +11,11 @@ from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 DESCRIPTION = "Generates CSV report with spikes found on Graphite hosts"
 
 # Sleep value bethween requests to same host
-SLEEP_VAL = 1
+DEFAULT_SLEEP_VAL = 1
 # Limit of requests per host
-HOST_LIMIT = 500
+DEFAULT_HOST_LIMIT = 500
 # Output file
-OUTPUT_FILE = 'report.csv'
+DEFAULT_OUTPUT_FILE = 'report.csv'
 
 def get_host_targets(host_string, pattern):
     """Returns targets that match pattern from a graphite host"""
@@ -50,7 +50,7 @@ def get_arguments():
 
     arg_parser.add_argument('-l', '--limit',
                             nargs = 1,
-                            default = [HOST_LIMIT],
+                            default = [DEFAULT_HOST_LIMIT],
                             type = int,
                             help = 'Limit request count per host')
 
@@ -62,13 +62,13 @@ def get_arguments():
 
     arg_parser.add_argument('-t', '--timeout',
                             nargs = 1,
-                            default = [HOST_LIMIT],
+                            default = [DEFAULT_HOST_LIMIT],
                             type = int,
                             help = 'Timeout bethween requests for host')
 
     arg_parser.add_argument('-o', '--output',
                             nargs = 1,
-                            default = [OUTPUT_FILE],
+                            default = [DEFAULT_OUTPUT_FILE],
                             type = str,
                             help = 'Output CSV file')
 
