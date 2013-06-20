@@ -118,6 +118,13 @@ def get_arguments():
                             required = True,
                             help = 'Servers queried by program')
 
+    arg_parser.add_argument('-o', '--output',
+                            nargs = 1,
+                            default = [DEFAULT_OUTPUT_FILE],
+                            required = True,
+                            type = str,
+                            help = 'Output CSV file')
+
     arg_parser.add_argument('-l', '--limit',
                             nargs = 1,
                             default = [DEFAULT_HOST_LIMIT],
@@ -135,16 +142,6 @@ def get_arguments():
                             default = [DEFAULT_SLEEP_VAL],
                             type = int,
                             help = 'Timeout bethween requests for host')
-
-    arg_parser.add_argument('-o', '--output',
-                            nargs = 1,
-                            default = [DEFAULT_OUTPUT_FILE],
-                            type = str,
-                            help = 'Output CSV file')
-
-    arg_parser.add_argument('-u', '--upload',
-                            action = 'store_true',
-                            help = 'Upload to Google Drive using config.py')
 
     return arg_parser.parse_args(sys.argv[1:])
 
