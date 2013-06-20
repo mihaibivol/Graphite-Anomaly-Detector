@@ -43,3 +43,18 @@ HOST, METRIC, TIME, RELEVANCE, GRAPH_URL
 Developing Detectors
 --------------------
 TODO
+
+Testing Detectors
+-----------------
+
+For testing you can use test_local.py.
+
+It requires matplotlib for plotting the results.
+
+test_local.py receives a Graphite json response for a given target and plots the following:
+ * Original timeseries
+ * Timeseries after running the detector
+ * Detector results
+ * A treshold line (you can remove it while testing)
+
+You just have to replace SpikeDetector with your detector.
