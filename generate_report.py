@@ -37,6 +37,13 @@ def get_host_targets(host_string, pattern):
     finally:
         return targets
 
+def get_anomaly_url(host_string, target, timestamp):
+    url_base = 'http://%s/render/?target=%s&from=%s&until=%s&width=1200&height=600'
+
+    half_day = 12 * 3600
+    return url_base % (host_string, target,
+                       timestamp - half_day, timestamp + half_day)
+
 def get_timeseries(host_string, target):
     """Returns tuple timeseries, timestamps for host matching target"""
 
@@ -87,7 +94,8 @@ def process(targets, timeout, output_file):
                 print 'Exception occured during detect_anomalies: %s' % e
 
             for timestamp, priority in anomalies:
-                data = [host_string, target, time.ctime(timestamp), priority]
+                data = [host_string, target, time.ctime(timestamp), priority,
+                        get_anomaly_url(host_string, target, timestamp)]
                 results.append(data)
 
         # Sleep bethween requests
