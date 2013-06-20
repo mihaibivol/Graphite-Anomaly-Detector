@@ -1,2 +1,1 @@
-from sliding_window_detector import SlidingWindowDetector
 from spike_detector import SpikeDetector

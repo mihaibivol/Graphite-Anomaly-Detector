@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from detector import SlidingWindowDetector, SpikeDetector
+from detector import SpikeDetector
 from util.plot import plot_data
 
 import sys
