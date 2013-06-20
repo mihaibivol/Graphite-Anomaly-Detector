@@ -38,16 +38,20 @@ class SpikeDetector(Detector):
 
     @classmethod
     def _get_top_spikes(cls, spikes, duration):
+        """Returns top spikes having tiestamps that differ by duration"""
+        ret = []
+
         while len(spikes):
             # Get the spike with the maximum priority
             max_ts = max(spikes.iteritems(), key=operator.itemgetter(1))[0]
 
             if spikes[max_ts] > .2:
-                yield max_ts, spikes[max_ts]
+                ret.append((max_ts, spikes[max_ts]))
 
             spikes = { k: v for k, v in spikes.iteritems() \
                        if abs(k - max_ts) > duration }
 
+        return ret
 
     @classmethod
     def detect_anomalies(cls, timeseries, timestamps):
@@ -56,7 +60,7 @@ class SpikeDetector(Detector):
 
         # Check empty lists
         if len(timeseries) == 0:
-            return
+            return []
 
         # Get the mean of all local maxima to have a treshold for spikes
         max_value = numpy.mean(cls._get_local_maxima(timeseries))
