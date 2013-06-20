@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import csv
 import fnmatch
 import json
 import requests
@@ -7,6 +8,7 @@ import time
 import sys
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from detector import SpikeDetector
 
 DESCRIPTION = "Generates CSV report with spikes found on Graphite hosts"
 
@@ -15,7 +17,10 @@ DEFAULT_SLEEP_VAL = 1
 # Limit of requests per host
 DEFAULT_HOST_LIMIT = 500
 # Output file
-DEFAULT_OUTPUT_FILE = 'report.csv'
+DEFAULT_OUTPUT_FILE = None
+
+# Detector class
+DETECTOR = SpikeDetector()
 
 def get_host_targets(host_string, pattern):
     """Returns targets that match pattern from a graphite host"""
@@ -44,12 +49,10 @@ def get_timeseries(host_string, target):
 
     return timeseries, timestamps
 
-def detect_anomalies(detector, timeseries, timestamps):
-    """Returns spikes found in timeseries using detector"""
-    return []
-
-def process(targets, timeout):
+def process(targets, timeout, output_file):
     # Send requests without timeouts to all servers
+    results = []
+
     while len(targets) != 0:
         for host_string in targets.keys():
             # Get target
@@ -60,11 +63,25 @@ def process(targets, timeout):
 
             # Process
             timeseries, timestamps = get_timeseries(host_string, target)
-            print timeseries, timestamps
-            anomalies = detect_anomalies(None, timeseries, timestamps)
+            try:
+                anomalies = DETECTOR.detect_anomalies(timeseries, timestamps)
+            except Exception:
+                print "Exception occured during detect_anomalies"
+
+            for timestamp, priority in anomalies:
+                data = [host_string, target, time.ctime(timestamp), priority]
+                results.append(data)
 
         # Sleep bethween requests
         time.sleep(timeout)
+
+    if output_file is None:
+        return
+
+    # Write results to csv file
+    with open(output_file, 'w') as f:
+        csv_writer = csv.writer(f, delimiter = ' ')
+        csv_writer.writerows(results)
 
 def get_arguments():
     arg_parser = ArgumentParser(description = DESCRIPTION,
@@ -111,11 +128,13 @@ def main():
     pattern = args['pattern'][0]
     limit = args['limit'][0]
     timeout = args['timeout'][0]
+    output_file = args['output'][0]
+
     # Get servers targets
     targets = { s: get_host_targets(s, pattern)[:limit] \
                 for s in args['servers'] }
 
-    process(targets, timeout)
+    process(targets, timeout, output_file)
 
 if __name__ == "__main__":
     sys.exit(main())
