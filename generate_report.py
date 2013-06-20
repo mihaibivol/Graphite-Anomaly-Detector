@@ -38,7 +38,7 @@ def get_host_targets(host_string, pattern):
         return targets
 
 def get_anomaly_url(host_string, target, timestamp):
-    url_base = 'http://%s/render/?target=%s&from=%s&until=%s&width=1200&height=600'
+    url_base = '=HYPERLINK(\"http://%s/render/?target=%s&from=%s&until=%s&width=1200&height=600\")'
 
     half_day = 12 * 3600
     return url_base % (host_string, target,
@@ -100,6 +100,7 @@ def process(targets, timeout, output_file):
 
         # Sleep bethween requests
         time.sleep(timeout)
+        print target
 
     if output_file is None:
         return
