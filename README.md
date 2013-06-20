@@ -38,11 +38,16 @@ Result
 
 The program creates a csv file ginven as argument for the --output option having 5 columns:
 
-HOST, METRIC, TIME, RELEVANCE, GRAPH_URL
+| HOST    | METRIC     | TIME        | RELEVANCE | GRAPH_URL                               |
+|---------|------------|-------------|-----------|-----------------------------------------|
+| host:81 | cpu.0.wait | 4 Jul 2013  | .42       | http://host:81/render/?target=cpu.0.wait|
 
 Developing Detectors
 --------------------
-TODO
+All detectors should extend the Detector class and implement the detect_anomalies method.
+
+To change the detector in the program, just change the DETECTOR=SpikeDetector() line with an instance
+of your detector.
 
 Testing Detectors
 -----------------
