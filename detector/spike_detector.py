@@ -3,13 +3,12 @@ from saxpy import SAX
 
 import numpy
 import string
+import operator
 
 class SpikeDetector(Detector):
     ALPHABET_SIZE = 4
     WINDOW_SECONDS_COUNT = 3600 * 8
     SECONDS_PER_SYMBOL = 1200
-
-    TRESHOLD_FACTOR = .1
 
     @classmethod
     def _get_local_maxima(cls, timeseries):
@@ -24,6 +23,33 @@ class SpikeDetector(Detector):
         return ret
 
     @classmethod
+    def _get_basic_spike_prio(cls, value, treshold):
+        """Return priority for basic spike that is usually smoothed"""
+        prio = (value - treshold) / treshold
+
+        return min(prio, 1.0)
+
+
+    @classmethod
+    def _get_basic_spikes(cls, timeseries, timestamps, treshold):
+        """Returns basic spikes that are usually smoothed"""
+        return { timestamps[i]:cls._get_basic_spike_prio(timeseries[i], treshold) \
+                 for i in range(len(timeseries)) if timeseries[i] > treshold }
+
+    @classmethod
+    def _get_top_spikes(cls, spikes, duration):
+        while len(spikes):
+            # Get the spike with the maximum priority
+            max_ts = max(spikes.iteritems(), key=operator.itemgetter(1))[0]
+
+            if spikes[max_ts] > .2:
+                yield max_ts, spikes[max_ts]
+
+            spikes = { k: v for k, v in spikes.iteritems() \
+                       if abs(k - max_ts) > duration }
+
+
+    @classmethod
     def detect_anomalies(cls, timeseries, timestamps):
         """Detects anomalies in a timeseries"""
         super(cls, SpikeDetector).detect_anomalies(timeseries, timestamps)
@@ -35,8 +61,11 @@ class SpikeDetector(Detector):
         # Get the mean of all local maxima to have a treshold for spikes
         max_value = numpy.mean(cls._get_local_maxima(timeseries))
 
+        # Save a copy of original timeseries
+        orig_timeseries = timeseries[:]
+
         # Smoooth data
-        cls.smooth_data(timeseries)
+        cls.smooth_data(timeseries, 2)
 
         # Seconds bethween measurements
         retention = (timestamps[-1] - timestamps[0]) / len(timestamps)
@@ -51,7 +80,6 @@ class SpikeDetector(Detector):
 
         sax_generator = SAX(wordSize = num_symbols, alphabetSize = cls.ALPHABET_SIZE)
 
-        # TODO really ugly aproximation
         symbols_per_datapoint = int(round(cls.SECONDS_PER_SYMBOL / float(retention)))
 
         # Convert timeseries into SAX notation
@@ -72,12 +100,15 @@ class SpikeDetector(Detector):
                     maximum_count[index] += 1
                 window_count[index] += 1
 
-        #TODO get foruma for treshold using the mean of all local maxima
-        treshold = 0
+        treshold = max_value
+
+        spikes = cls._get_basic_spikes(orig_timeseries, timestamps, 5 * treshold)
 
         for key, value in maximum_count.iteritems():
             if value == window_count[key] and value and \
                timeseries[key] > treshold:
-                yield (timestamps[key], timeseries[key])
+                   val = timeseries[key]
+                   spikes[timestamps[key]] = cls._get_basic_spike_prio(val, treshold)
 
+        return cls._get_top_spikes(spikes, cls.WINDOW_SECONDS_COUNT)
 
