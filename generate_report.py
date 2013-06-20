@@ -24,49 +24,67 @@ DETECTOR = SpikeDetector()
 
 def get_host_targets(host_string, pattern):
     """Returns targets that match pattern from a graphite host"""
-    response = requests.get('http://%s/metrics/index.json' % host_string)
 
-    targets = json.loads(response.text)
+    targets = []
+    try:
+        response = requests.get('http://%s/metrics/index.json' % host_string)
 
-    targets = [t for t in targets if fnmatch.fnmatch(t, pattern)]
+        targets = json.loads(response.text)
 
-    return targets
+        targets = [t for t in targets if fnmatch.fnmatch(t, pattern)]
+    except Exception as e:
+        print 'Exception occured while getting host target: %s' % e
+    finally:
+        return targets
 
 def get_timeseries(host_string, target):
-    """Returns tuple timeseries, timestamps for host"""
+    """Returns tuple timeseries, timestamps for host matching target"""
+
     url = 'http://%s/render/' % host_string
     payload = {
             'target': target,
             'format': 'json' }
-    response = requests.get(url, params = payload)
 
-    data = json.loads(response.text)
+    timeseries = []
+    timestamps = []
+    try:
+        response = requests.get(url, params = payload)
 
-    detector_data = data[0]['datapoints']
+        data = json.loads(response.text)
 
-    timeseries = [t[0] for t in detector_data]
-    timestamps = [t[1] for t in detector_data]
+        detector_data = data[0]['datapoints']
 
-    return timeseries, timestamps
+        timeseries = [t[0] for t in detector_data]
+        timestamps = [t[1] for t in detector_data]
+    except Exception as e:
+        print 'Exception occured while getting timeseries' \
+              'for %s with target %s: %s' % (host_string, target, e)
+
+    finally:
+        return timeseries, timestamps
 
 def process(targets, timeout, output_file):
-    # Send requests without timeouts to all servers
+    """Process the received targets"""
+
     results = []
 
+    # Send requests without timeouts to all servers
     while len(targets) != 0:
         for host_string in targets.keys():
-            # Get target
-            target = targets[host_string].pop()
             # Check remaining targets
             if len(targets[host_string]) == 0:
                 del targets[host_string]
+                continue
+
+            # Get target
+            target = targets[host_string].pop()
 
             # Process
             timeseries, timestamps = get_timeseries(host_string, target)
             try:
                 anomalies = DETECTOR.detect_anomalies(timeseries, timestamps)
             except Exception:
-                print "Exception occured during detect_anomalies"
+                print 'Exception occured during detect_anomalies: %s' % e
 
             for timestamp, priority in anomalies:
                 data = [host_string, target, time.ctime(timestamp), priority]

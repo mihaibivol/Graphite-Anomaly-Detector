@@ -27,6 +27,11 @@ class SpikeDetector(Detector):
     def detect_anomalies(cls, timeseries, timestamps):
         """Detects anomalies in a timeseries"""
         super(cls, SpikeDetector).detect_anomalies(timeseries, timestamps)
+
+        # Check empty lists
+        if len(timeseries) == 0:
+            return
+
         # Get the mean of all local maxima to have a treshold for spikes
         max_value = numpy.mean(cls._get_local_maxima(timeseries))
 
