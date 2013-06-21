@@ -70,16 +70,16 @@ def get_timeseries(host_string, target):
     finally:
         return timeseries, timestamps
 
-def process(targets, timeout, output_file):
+def process(targets, timeout, output_file, detector):
     """Process the received targets and output to output_file"""
     assert output_file is not None, \
           'Must give a valid output file'
 
     with open(output_file, 'w') as f:
         csv_writer = csv.writer(f, delimiter = ' ')
-        process_targets(targets, timeout, csv_writer)
+        process_targets(targets, timeout, csv_writer, detector)
 
-def process_targets(targets, timeout, csv_writer):
+def process_targets(targets, timeout, csv_writer, detector):
     """Process the received targets and output to csv_writer"""
 
     # Send requests without timeouts to all servers
@@ -96,7 +96,7 @@ def process_targets(targets, timeout, csv_writer):
             # Process
             timeseries, timestamps = get_timeseries(host_string, target)
             try:
-                anomalies = DETECTOR.detect_anomalies(timeseries, timestamps)
+                anomalies = detector.detect_anomalies(timeseries, timestamps)
             except Exception:
                 print 'Exception occured during detect_anomalies: %s' % e
 
@@ -157,7 +157,7 @@ def main():
     targets = { s: get_host_targets(s, pattern)[:limit] \
                 for s in args['servers'] }
 
-    process(targets, timeout, output_file)
+    process(targets, timeout, output_file, DETECTOR)
 
 if __name__ == "__main__":
     sys.exit(main())
