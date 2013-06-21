@@ -6,6 +6,8 @@ from util.plot import plot_data
 import sys
 import json
 
+DETECTOR = SpikeDetector()
+
 def main(filename):
     fp = open(filename, 'r')
 
@@ -22,7 +24,7 @@ def main(filename):
     orig_series = timeseries[:]
     orig_stamps = timestamps[:]
 
-    res = SpikeDetector.detect_anomalies(timeseries, timestamps)
+    res = DETECTOR.detect_anomalies(timeseries, timestamps)
 
     plot_data(filename, (orig_stamps, orig_series), (timestamps, timeseries), res)
 
