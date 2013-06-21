@@ -23,7 +23,12 @@ class Detector(object):
 
     @classmethod
     def smooth_data(cls, timeseries, level = 3):
-        """Smooth local maxima and minima level times"""
+        """
+        Smooth local maxima and minima level times.
+
+        Smoothing is done by eliminating local maxima and minima and
+        replacing them with the mean of the neighbours
+        """
         while level:
             cls._smooth_data(timeseries)
             level -= 1
