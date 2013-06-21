@@ -63,3 +63,7 @@ test_local.py receives a Graphite json response for a given target and plots the
  * A treshold line (you can remove it while testing)
 
 You just have to replace SpikeDetector with your detector.
+
+For testing large data, you can use the util.logger ```create_logfile``` function.
+It creates a json file that can be viewed using view_log.py script that plots a graph
+simmilar to the one yielded by test_local.py.
