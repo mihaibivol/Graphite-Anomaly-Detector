@@ -71,9 +71,16 @@ def get_timeseries(host_string, target):
         return timeseries, timestamps
 
 def process(targets, timeout, output_file):
-    """Process the received targets"""
+    """Process the received targets and output to output_file"""
+    assert output_file is not None, \
+          'Must give a valid output file'
 
-    results = []
+    with open(output_file, 'w') as f:
+        csv_writer = csv.writer(f, delimiter = ' ')
+        process_targets(targets, timeout, csv_writer)
+
+def process_targets(targets, timeout, csv_writer):
+    """Process the received targets and output to csv_writer"""
 
     # Send requests without timeouts to all servers
     while len(targets) != 0:
@@ -96,19 +103,11 @@ def process(targets, timeout, output_file):
             for timestamp, priority in anomalies:
                 data = [host_string, target, time.ctime(timestamp), priority,
                         get_anomaly_url(host_string, target, timestamp)]
-                results.append(data)
+                csv_writer.writerow(data)
 
         # Sleep bethween requests
         time.sleep(timeout)
-        print target
-
-    if output_file is None:
-        return
-
-    # Write results to csv file
-    with open(output_file, 'w') as f:
-        csv_writer = csv.writer(f, delimiter = ' ')
-        csv_writer.writerows(results)
+        print 'Processed %s' % target
 
 def get_arguments():
     arg_parser = ArgumentParser(description = DESCRIPTION,
