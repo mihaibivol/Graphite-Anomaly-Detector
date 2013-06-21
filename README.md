@@ -6,7 +6,7 @@ Command line application that determines spikes in Graphite metrics for a given 
 Usage
 -----
 <pre>
-usage: generate_report.py [-h] -s SERVERS [SERVERS ...] -o OUTPUT [-l LIMIT]
+usage: generate_report [-h] -s SERVERS [SERVERS ...] -o OUTPUT [-l LIMIT]
                           [-p PATTERN] [-t TIMEOUT]
 
 Generates CSV report with spikes found on Graphite hosts
@@ -32,6 +32,12 @@ For example
 
 Will gather the first two metrics that match \*.cpu.\* with 42 seconds timeout bethween the requests.
 The command will ouptut the results in report.csv
+
+Install
+-------
+```
+python setup.py install
+```
 
 Result
 ------
