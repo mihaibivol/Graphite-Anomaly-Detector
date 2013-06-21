@@ -105,11 +105,11 @@ class SpikeDetector(Detector):
     @classmethod
     def detect_anomalies(cls, timeseries, timestamps):
         """Detects anomalies in a timeseries"""
-        # Check many None values
-        if timeseries.count(None) > len(timeseries) / 2:
-            return []
 
-        super(cls, SpikeDetector).detect_anomalies(timeseries, timestamps)
+        try:
+            super(cls, SpikeDetector).detect_anomalies(timeseries, timestamps)
+        except ValueError:
+            return []
 
         # Check empty lists
         if len(timeseries) == 0:

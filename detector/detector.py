@@ -9,6 +9,10 @@ class Detector(object):
         assert len(timeseries) == len(timestamps), \
                "Must provide equal length timeseries and timestamp lists"
 
+        # Check many None values
+        if timeseries.count(None) > len(timeseries) / 2:
+            raise ValueError("Can't generate anomalies with too many None values")
+
         # Convert null values
         cls.convert_null_values(timeseries)
 
