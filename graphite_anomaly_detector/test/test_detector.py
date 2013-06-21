@@ -1,4 +1,4 @@
-from detector.detector import Detector
+from graphite_anomaly_detector.detector.detector import Detector
 from unittest import TestCase
 
 class TestDetector(TestCase):

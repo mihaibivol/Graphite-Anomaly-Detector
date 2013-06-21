@@ -1,4 +1,4 @@
-from generate_report import process_targets, process
+from graphite_anomaly_detector.generate_report import process_targets, process
 from unittest import TestCase
 
 import mock
@@ -20,7 +20,7 @@ class TestGenerateReport(TestCase):
     def setUp(self):
         pass
 
-    @mock.patch('generate_report.get_timeseries', lambda x, y : ([1, 2, 3], [4, 5, 6]))
+    @mock.patch('graphite_anomaly_detector.generate_report.get_timeseries', lambda x, y : ([1, 2, 3], [4, 5, 6]))
     def test_processing(self):
         """Test that all targets are processed"""
 
