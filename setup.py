@@ -5,7 +5,7 @@ with open('./README.md', 'r') as readme_file:
 
 setup(
 	name='graphite_anomaly_detector',
-	version='0.1',
+	version='0.2.1',
 	author='Mihai Bivol',
 	author_email='mm.bivol@gmail.com',
 	url='https://github.com/mihaibivol/Graphite-Anomaly-Detector/',
@@ -17,7 +17,7 @@ setup(
 	install_requires=['requests', 'numpy',],
 	entry_points={
 		'console_scripts': [
-            'generate_report = graphite_anomaly_detector.generate_report:main',
+            'generate_graphite_report = graphite_anomaly_detector.generate_report:main',
 			]
 		},
 )
