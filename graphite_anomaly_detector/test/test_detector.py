@@ -43,4 +43,10 @@ class TestDetector(TestCase):
         self.assertEqual(timeseries[1], 1,
                          "Local min is not smoothed")
 
+    def test_smooth_data_n_times(self):
+        """Test if the data is smoothed the requested times"""
+        timeseries = [1, 4, 5, 2]
+        self.detector.smooth_data(timeseries, 3)
+        self.assertEqual(timeseries, [1, 2, 2, 2],
+                         "Smoothing is not done correctly")
 
