@@ -29,9 +29,8 @@ class Detector(object):
         Smoothing is done by eliminating local maxima and minima and
         replacing them with the mean of the neighbours
         """
-        while level:
+        for l in xrange(level):
             cls._smooth_data(timeseries)
-            level -= 1
 
 
     @classmethod
