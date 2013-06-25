@@ -16,6 +16,11 @@ class DetectorMock(object):
     def detect_anomalies(self, timeseries, timestamp):
         return [(1, .1), (2, .2)]
 
+class ErrorDetectorMock(object):
+    """Produces two anomalies for any givem timeseries"""
+    def detect_anomalies(self, timeseries, timestamp):
+        raise Exception
+
 class TestGenerateReport(TestCase):
     def setUp(self):
         pass
@@ -51,3 +56,21 @@ class TestGenerateReport(TestCase):
         self.assertRaises(AssertionError,
                           process,
                           None, None, None, None)
+
+    @mock.patch('graphite_anomaly_detector.generate_report.get_timeseries', lambda x, y : ([1, 2, 3], [4, 5, 6]))
+    def test_processing(self):
+        """Test that all targets are processed"""
+
+        s1 = 'gigi'
+        t1 = ['becali']
+
+        # Test servers with a list of metrics
+        targets = {s1: t1}
+
+        writer = CSVWriterMock()
+        detector = ErrorDetectorMock()
+
+        process_targets(targets, 0, writer, detector)
+
+        # Test that nothing was processed
+        self.assertEqual(len(writer.lines), 0)

@@ -93,11 +93,12 @@ def process_targets(targets, timeout, csv_writer, detector):
             # Get target
             target = targets[host_string].pop()
 
+            anomalies = []
             # Process
             timeseries, timestamps = get_timeseries(host_string, target)
             try:
                 anomalies = detector.detect_anomalies(timeseries, timestamps)
-            except Exception:
+            except Exception as e:
                 print 'Exception occured during detect_anomalies: %s' % e
 
             for timestamp, priority in anomalies:
@@ -105,9 +106,10 @@ def process_targets(targets, timeout, csv_writer, detector):
                         get_anomaly_url(host_string, target, timestamp)]
                 csv_writer.writerow(data)
 
+            print 'Processed %s' % target
+
         # Sleep bethween requests
         time.sleep(timeout)
-        print 'Processed %s' % target
 
 def get_arguments():
     arg_parser = ArgumentParser(description = DESCRIPTION,
